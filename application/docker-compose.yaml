@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    image: store-api
+    container_name: my-store
+    ports:
+      - "8080:8080"
