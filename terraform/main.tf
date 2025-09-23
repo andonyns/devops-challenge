@@ -43,6 +43,6 @@ resource "null_resource" "helm_backend" {
   depends_on = [null_resource.build_and_push_backend]
 
   provisioner "local-exec" {
-    command = "helm upgrade --install backend ../kubernetes/backend --set image.repository=localhost:5000/store-api --set image.tag=latest --kube-context minikube"
+    command = "helm upgrade --install backend ../kubernetes/helm-chart --set image.repository=localhost:5000/store-api --set image.tag=latest --kube-context minikube"
   }
 }
