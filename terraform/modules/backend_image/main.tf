@@ -4,7 +4,7 @@ resource "null_resource" "build_and_push_backend" {
   provisioner "local-exec" {
     command = <<EOT
       eval $(minikube -p minikube docker-env)
-      docker build -t localhost:5000/store-api:latest ../../application/backend
+      docker build -t localhost:5000/store-api:latest ${path.module}/../../../application/backend
       docker push localhost:5000/store-api:latest
     EOT
     interpreter = ["bash", "-c"]
