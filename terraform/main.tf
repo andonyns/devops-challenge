@@ -1,16 +1,3 @@
-terraform {
-  required_providers {
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "~> 3.0"
-    }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.0"
-    }
-  }
-}
-
 provider "docker" {}
 
 provider "kubernetes" {
@@ -18,31 +5,17 @@ provider "kubernetes" {
   config_context = "minikube"
 }
 
-# Start minikube with the local registry addon enabled
-resource "null_resource" "minikube_start" {
-  provisioner "local-exec" {
-    command = "minikube start --driver=docker && minikube addons enable registry"
-  }
-  triggers = {
-    always_run = "${timestamp()}"
-  }
+module "minikube" {
+  source = "./modules/minikube"
 }
 
-# Build and push the backend image to the local minikube registry
-resource "null_resource" "build_and_push_backend" {
-  depends_on = [null_resource.minikube_start]
-
-  provisioner "local-exec" {
-    command = "${path.module}/scripts/build_and_push.sh"
-    interpreter = ["bash", "-c"]
-  }
+module "backend_image" {
+  source = "./modules/backend_image"
+  minikube_depends_on = [module.minikube]
 }
 
-# Deploy the backend Helm chart, using the local registry image
-resource "null_resource" "helm_backend" {
-  depends_on = [null_resource.build_and_push_backend]
-
-  provisioner "local-exec" {
-    command = "helm upgrade --install backend ../kubernetes/helm-chart --set image.repository=localhost:5000/store-api --set image.tag=latest --kube-context minikube"
-  }
+module "helm_backend" {
+  source = "./modules/helm_backend"
+  backend_image_depends_on = [module.backend_image]
+  local_registry = var.local_registry
 }
