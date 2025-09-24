@@ -1,0 +1,29 @@
+pipeline {
+	agent any
+	environment {
+		TF_DIR = "${WORKSPACE}/terraform"
+	}
+	stages {
+        stage('Checkout code') {
+            steps {
+                git url: 'https://github.com/andonyns/devops-challenge', branch: 'main'
+            }
+        }
+
+		stage('Terraform Init') {
+			steps {
+				dir('terraform') {
+					sh 'terraform init'
+				}
+			}
+		}
+
+		stage('Terraform Plan') {
+			steps {
+				dir('terraform') {
+					sh 'terraform plan'
+				}
+			}
+		}
+	}
+}
