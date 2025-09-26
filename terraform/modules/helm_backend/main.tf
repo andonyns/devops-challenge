@@ -1,14 +1,10 @@
 
 resource "null_resource" "helm_backend" {
-  depends_on = [var.backend_image_depends_on]
+  depends_on = [var.depends_on_application]
 
   provisioner "local-exec" {
-    command = "helm upgrade --install backend ${path.module}/../../../kubernetes/helm-chart --set image.repository=${var.local_registry} --set image.tag=latest --kube-context minikube"
+    command = "helm upgrade --install backend ${path.module}/../../../kubernetes/helm-chart --set image.repository=${var.docker_registry}/${var.api_image} --set image.tag=${var.api_image_tag} --kube-context minikube"
   }
-}
-
-variable "backend_image_depends_on" {
-  description = "Dependency for backend image build"
 }
 
 

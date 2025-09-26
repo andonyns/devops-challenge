@@ -9,13 +9,18 @@ module "minikube" {
   source = "./modules/minikube"
 }
 
-module "backend_image" {
-  source = "./modules/backend_image"
-  minikube_depends_on = [module.minikube]
+module "build_application" {
+  source = "./modules/application"
+  depends_on_minikube = [module.minikube]
+  docker_registry = var.docker_registry
+  api_image = var.api_image
+  api_image_tag = var.api_image_tag
 }
 
 module "helm_backend" {
   source = "./modules/helm_backend"
-  backend_image_depends_on = [module.backend_image]
-  local_registry = var.local_registry
+  depends_on_application = [module.build_application]
+  docker_registry = var.docker_registry
+  api_image = var.api_image
+  api_image_tag = var.api_image_tag
 }
