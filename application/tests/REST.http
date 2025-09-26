@@ -1,0 +1,26 @@
+http://127.0.0.1:3000/items
+
+###
+
+POST http://127.0.0.1:3000/items
+Content-Type: application/json
+
+"test1"
+
+###
+
+GET http://127.0.0.1:3000/items/1
+
+###
+
+PUT http://127.0.0.1:3000/items/1
+Content-Type: application/json
+
+"updated item 1"
+
+
+###
+DELETE http://127.0.0.1:3000/items/1
+
+### 
+http://127.0.0.1:3000/items
