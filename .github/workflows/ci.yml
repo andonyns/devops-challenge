@@ -6,11 +6,6 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'The branch to run on'
-        required: true
-        default: 'main'
 
 jobs:
   jenkins:
@@ -22,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.7
         with:
-          ref: ${{ github.event.inputs.branch || github.ref }}
+          ref: ${{ github.ref }}
       - name: Run Jenkinsfile
         uses: jenkinsci/jfr-static-image-action@master
         with:
