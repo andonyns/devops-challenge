@@ -10,6 +10,22 @@ pipeline {
             }
         }
 
+		stage('Analyze Files') {
+			steps {
+				script {
+					docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
+						try {
+							// Scan the entire repository directory for infrastructure-as-code misconfigurations.
+							sh 'checkov -d . --use-enforcement-rules -o cli -o junitxml --output-file-path console,results.xml --repo-id andonyns/devops-challenge --branch main'
+							junit skipPublishingChecks: true, testResults: 'results.xml'
+						} catch (err) {
+							junit skipPublishingChecks: true, testResults: 'results.xml'
+							throw err
+						}
+					}
+				}
+			}
+		}
 		stage('Terraform Init') {
 			steps {
 				dir('terraform') {

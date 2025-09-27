@@ -41,7 +41,6 @@ secrets.yaml
 node_modules/
 dist/
 .idea/
-.vscode/
 .DS_Store
 *.swp
 *.swo

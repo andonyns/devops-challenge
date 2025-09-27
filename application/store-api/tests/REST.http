@@ -20,7 +20,7 @@ Content-Type: application/json
 
 
 ###
-DELETE http://127.0.0.1:3000/items/1
+DELETE http://127.0.0.1:3000/items/2
 
 ### 
 http://127.0.0.1:3000/items
