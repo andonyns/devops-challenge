@@ -6,20 +6,20 @@ provider "kubernetes" {
 }
 
 module "minikube" {
-  source = "./modules/minikube"
+  source = "./modules/cluster"
 }
 
 module "build_application" {
-  source = "./modules/application"
-  depends_on_minikube = [module.minikube]
+  source = "./modules/publish"
+  dependency = [module.minikube]
   docker_registry = var.docker_registry
   api_image = var.api_image
   api_image_tag = var.api_image_tag
 }
 
-module "helm_backend" {
-  source = "./modules/helm_backend"
-  depends_on_application = [module.build_application]
+module "backend" {
+  source = "./modules/backend"
+  dependency = [module.build_application]
   docker_registry = var.docker_registry
   api_image = var.api_image
   api_image_tag = var.api_image_tag
