@@ -10,9 +10,6 @@ on:
 jobs:
   jenkins:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./jenkins
     steps:
       - name: Checkout code
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.7
@@ -21,6 +18,6 @@ jobs:
       - name: Run Jenkinsfile
         uses: jenkinsci/jfr-static-image-action@master
         with:
-          jenkinsfile: Jenkinsfile
+          jenkinsfile: jenkins/Jenkinsfile
           pluginstxt: jenkins/plugins.txt
 
