@@ -25,4 +25,4 @@ jobs:
         with:
           jenkinsfile: Jenkinsfile
           pluginsfile: plugin.txt
-        working-directory: jenkins
+    working-directory: jenkins
