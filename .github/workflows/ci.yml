@@ -22,5 +22,5 @@ jobs:
         uses: jenkinsci/jfr-static-image-action@master
         with:
           jenkinsfile: Jenkinsfile
-          pluginstxt: plugins.txt
+          pluginstxt: jenkins/plugins.txt
 
