@@ -1,5 +1,5 @@
 resource "null_resource" "build_and_push_backend" {
-  depends_on = [var.depends_on_minikube]
+  depends_on = [var.dependency]
 
   provisioner "local-exec" {
     command = <<EOT

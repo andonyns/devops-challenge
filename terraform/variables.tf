@@ -1,7 +1,6 @@
 variable "docker_registry" {
   description = "Docker registry to push images to"
   type        = string
-  default     = "localhost:5000"
 }
 
 variable "api_image" {

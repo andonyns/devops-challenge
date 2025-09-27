@@ -1,5 +1,5 @@
-variable "depends_on_application" {
-  description = "Dependency for backend image build"
+variable "dependency" {
+  description = "Dependency for startup"
 }
 
 variable "docker_registry" {

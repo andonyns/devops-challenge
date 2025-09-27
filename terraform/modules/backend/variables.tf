@@ -1,5 +1,5 @@
-variable "depends_on_minikube" {
-  description = "Dependency for minikube startup"
+variable "dependency" {
+  description = "Dependency for backend image build"
 }
 
 variable "docker_registry" {
