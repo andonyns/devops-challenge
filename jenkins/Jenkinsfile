@@ -10,6 +10,14 @@ pipeline {
             }
         }
 
+		stage('Checkov') {
+			steps {
+				dir('terraform') {
+					sh 'pipenv run pip install checkov'
+					sh 'pipenv run checkov -d . -o cli -o junitxml --output-file-path console,results.xml'
+				}
+			}
+		}
 		stage('Terraform Init') {
 			steps {
 				dir('terraform') {
