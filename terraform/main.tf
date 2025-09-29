@@ -24,3 +24,8 @@ module "backend" {
   api_image = var.api_image
   api_image_tag = var.api_image_tag
 }
+
+module "logging" {
+  source = "./modules/logging"
+  dependency = [module.minikube]
+}
