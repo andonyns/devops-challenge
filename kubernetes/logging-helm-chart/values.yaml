@@ -1,0 +1,26 @@
+loki:
+  image: grafana/loki:2.9.3
+  replicas: 1
+  service:
+    port: 3100
+    type: ClusterIP
+  persistence:
+    enabled: false
+
+promtail:
+  image: grafana/promtail:2.9.3
+  replicas: 1
+
+grafana:
+  image: grafana/grafana:10.2.2
+  replicas: 1
+  service:
+    port: 3000
+    type: NodePort
+    nodePort: 30300
+  adminPassword: admin
+  persistence:
+    enabled: false
+
+nameOverride: ""
+fullnameOverride: ""
