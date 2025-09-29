@@ -5,7 +5,7 @@ Build docker image:
 
 Run:
 ```bash
-docker run -p 8080:80 --name my-store -d store-api
+docker run -p 9000:80 --name my-store -d store-api
 ```
 
 Sample application that has CRUD (Create, Read, Update and Delete) operations for adding Items.
