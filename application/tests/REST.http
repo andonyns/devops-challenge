@@ -1,0 +1,28 @@
+@port = 33945
+
+http://127.0.0.1:{{port}}/items
+
+###
+
+POST http://127.0.0.1:{{port}}/items
+Content-Type: application/json
+
+"test1"
+
+###
+
+GET http://127.0.0.1:{{port}}/items/1
+
+###
+
+PUT http://127.0.0.1:{{port}}/items/1
+Content-Type: application/json
+
+"updated item 1"
+
+
+###
+DELETE http://127.0.0.1:{{port}}/items/2
+
+### 
+http://127.0.0.1:{{port}}/items
