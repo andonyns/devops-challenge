@@ -1,0 +1,37 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: promtail
+  namespace: {{ .Release.Namespace }}
+spec:
+  chart:
+    repository: https://grafana.github.io/helm-charts
+    name: promtail
+    version: "6.10.0" # Specify the desired version of the Promtail chart
+  values:
+    config:
+      clients:
+        - url: http://{{ include "logging-stack.fullname" . }}-loki:{{ .Values.loki.service.port }}/loki/api/v1/push
+      positions:
+        filename: /data/positions.yaml
+      scrape_configs:
+        - job_name: kubernetes-pods
+          pipeline_stages:
+            - docker: {}
+          kubernetes_sd_configs:
+            - role: pod
+          relabel_configs:
+            - source_labels: [__meta_kubernetes_pod_label_app]
+              target_label: app
+        - job_name: system-logs
+          static_configs:
+            - targets: ['localhost']
+              labels:
+                job: varlogs
+                __path__: /var/log/*.log
+    extraVolumes:
+      - name: positions
+        emptyDir: {}
+    extraVolumeMounts:
+      - name: positions
+        mountPath: /data

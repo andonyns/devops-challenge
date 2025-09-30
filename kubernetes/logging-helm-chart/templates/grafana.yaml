@@ -1,0 +1,28 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: grafana
+  namespace: {{ .Release.Namespace }}
+spec:
+  chart:
+    repository: https://grafana.github.io/helm-charts
+    name: grafana
+    version: "6.20.0" # Specify the desired version of the Grafana chart
+  values:
+    admin:
+      existingSecret: grafana-admin-secret
+    service:
+      type: NodePort
+      nodePort: 30300
+    persistence:
+      enabled: true
+      size: 5Gi
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: Loki
+            type: loki
+            url: http://{{ .Values.loki.service.port }}/loki
+            access: proxy
+            isDefault: true

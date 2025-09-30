@@ -2,7 +2,6 @@
 *.tgz
 charts/
 tmpcharts/
-values.yaml
 
 # Kubernetes
 *.log
