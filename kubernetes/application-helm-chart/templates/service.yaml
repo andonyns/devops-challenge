@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "backend.name" . }}
+  name: {{ include "backend.fullname" . }}
 spec:
   type: {{ .Values.service.type }}
   selector:
@@ -9,5 +9,5 @@ spec:
   ports:
     - protocol: TCP
       port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.targetPort | default 9000 }}
+      targetPort: {{ .Values.service.targetPort | default 8080 }}
       nodePort: {{ .Values.service.nodePort }}

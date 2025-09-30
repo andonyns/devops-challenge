@@ -13,13 +13,13 @@ docker build -t local-jenkins:latest .
 To run, execute:
 
 ```bash
-docker run -d -p 8080:8080 -p 50000:50000 \
+docker run -d -p 8050:8080 -p 50000:50000 \
   -v jenkins_home:/var/jenkins_home \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --name jenkins local-jenkins:latest
 ```
 
-Browse http://localhost:8080 to configure Jenkins.
+Browse http://localhost:8050 to configure Jenkins.
 When requested for and Administrator password, run:
 
 ```bash

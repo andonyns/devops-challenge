@@ -101,4 +101,8 @@ app.MapDelete("/items/{id:int}", async (int id) =>
         : Results.NotFound();
 });
 
+// Health check endpoints
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
+app.MapGet("/ready", () => Results.Ok(new { status = "ready", timestamp = DateTime.UtcNow }));
+
 app.Run();

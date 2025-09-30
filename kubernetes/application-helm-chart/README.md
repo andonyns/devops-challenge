@@ -134,10 +134,10 @@ open http://$(minikube ip):30080
 ### Port Forwarding
 ```bash
 # Forward local port to service
-kubectl port-forward service/backend 9000:80
+kubectl port-forward service/backend 8080:80
 
 # Access via localhost
-curl http://localhost:9000
+curl http://localhost:8080
 ```
 
 ### Service Discovery
@@ -153,7 +153,7 @@ The deployment includes annotations for Prometheus metrics collection:
 ```yaml
 annotations:
   prometheus.io/scrape: "true"
-  prometheus.io/port: "9000"
+  prometheus.io/port: "8080"
   prometheus.io/path: "/metrics"
 ```
 
