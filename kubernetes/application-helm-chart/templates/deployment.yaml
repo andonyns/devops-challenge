@@ -23,6 +23,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 80
+          env:
+            - name: LOKI_SERVER
+              value: "http://loki-stack-loki:3100"
           livenessProbe:
             httpGet:
               path: /health
