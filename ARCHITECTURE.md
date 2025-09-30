@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the infrastructure architecture and CI/CD pipeline for the DevOps Challenge application. The solution demonstrates a complete containerized microservices deployment with monitoring, logging, and automated infrastructure provisioning.
+This document describes the updated infrastructure architecture and CI/CD pipeline for the DevOps Challenge application. The solution demonstrates a complete containerized microservices deployment with monitoring, logging, and automated infrastructure provisioning.
 
 ## Application Architecture
 
@@ -63,12 +63,12 @@ graph TB
 
 ### Monitoring & Logging
 - **Grafana**: Visualization and dashboards (accessible via NodePort 30300)
-- **Loki**: Log aggregation and storage
-- **Promtail**: Log collection from all pods
+- **Loki**: Log aggregation and storage (community Helm chart)
+- **Promtail**: Log collection from all pods (community Helm chart)
 
 ### Container Orchestration
 - **Minikube**: Local Kubernetes cluster
-- **Helm Charts**: Package management for Kubernetes deployments
+- **Helm Charts**: Community charts for Promtail, Loki, and Grafana
 - **Docker**: Container runtime and image building
 
 ## CI/CD Pipeline
@@ -129,139 +129,6 @@ graph TD
     class MK,DR,K8S,MON target
 ```
 
-## Terraform Module Architecture
-
-```mermaid
-graph TB
-    subgraph "Terraform Root"
-        ROOT[main.tf<br/>Provider Configuration<br/>Module Orchestration]
-        VAR[variables.tf<br/>Environment Variables]
-        OUT[outputs.tf<br/>Deployment URLs]
-    end
-    
-    subgraph "Terraform Modules"
-        subgraph "cluster/"
-            CM[main.tf<br/>minikube start<br/>enable registry<br/>enable ingress]
-        end
-        
-        subgraph "publish/"
-            PM[main.tf<br/>docker build<br/>docker push]
-            PV[variables.tf]
-        end
-        
-        subgraph "backend/"
-            BM[main.tf<br/>helm install<br/>application-helm-chart]
-            BV[variables.tf<br/>ingress config]
-        end
-        
-        subgraph "logging/"
-            LM[main.tf<br/>helm install<br/>logging-helm-chart]
-            LV[variables.tf]
-        end
-    end
-    
-    subgraph "Environment Files"
-        DEV[dev.tfvars<br/>store-api.local]
-        STG[staging.tfvars<br/>store-api-staging.local]
-        PRD[prod.tfvars<br/>store-api.example.com]
-    end
-    
-    ROOT --> CM
-    ROOT --> PM
-    ROOT --> BM
-    ROOT --> LM
-    
-    VAR --> DEV
-    VAR --> STG
-    VAR --> PRD
-    
-    classDef root fill:#e1f5fe
-    classDef modules fill:#fff3e0
-    classDef env fill:#f3e5f5
-    
-    class ROOT,VAR,OUT root
-    class CM,PM,BM,LM,PV,BV,LV modules
-    class DEV,STG,PRD env
-```
-
-## Helm Chart Structure
-
-```mermaid
-graph TB
-    subgraph "Application Helm Chart"
-        AC[Chart.yaml<br/>Application Metadata]
-        AV[values.yaml<br/>Configuration Values]
-        
-        subgraph "Templates"
-            DEP[deployment.yaml<br/>Pod Specification]
-            SVC[service.yaml<br/>Service Configuration]
-            ING[ingress.yaml<br/>Nginx Ingress Rules]
-            HLP[_helpers.tpl<br/>Template Functions]
-        end
-    end
-    
-    subgraph "Logging Helm Chart"
-        LC[Chart.yaml<br/>Logging Metadata]
-        LV[values.yaml<br/>Logging Configuration]
-        
-        subgraph "Templates"
-            GRA[grafana.yaml<br/>Grafana Deployment]
-            LOK[loki.yaml<br/>Loki Deployment]
-            PRO[promtail.yaml<br/>Promtail DaemonSet]
-            HLPL[_helpers.tpl<br/>Template Functions]
-        end
-    end
-    
-    AC --> AV
-    AV --> DEP
-    AV --> SVC
-    AV --> ING
-    
-    LC --> LV
-    LV --> GRA
-    LV --> LOK
-    LV --> PRO
-    
-    classDef chart fill:#e1f5fe
-    classDef templates fill:#fff3e0
-    classDef logging fill:#f3e5f5
-    
-    class AC,AV,LC,LV chart
-    class DEP,SVC,ING,HLP templates
-    class GRA,LOK,PRO,HLPL logging
-```
-
-## Environment Configuration
-
-### Development (dev.tfvars)
-- **Registry**: `localhost:5000`
-- **Host**: `store-api.local`
-- **Ingress**: Enabled
-- **Target**: Local Minikube
-
-### Staging (staging.tfvars)
-- **Registry**: `andonyns/devops-challenge`
-- **Host**: `store-api-staging.local`
-- **Image Tag**: `v0.0.1-dev001`
-- **Ingress**: Enabled
-
-### Production (prod.tfvars)
-- **Registry**: `andonyns/devops-challenge`
-- **Host**: `store-api.example.com`
-- **Image Tag**: `v1.0.0`
-- **Ingress**: Enabled
-
-## Security & Compliance
-
-### Security Scanning
-- **Checkov**: Infrastructure-as-Code security scanning
-- **Pipeline Integration**: Automated security checks in CI/CD
-
-### Access Control
-- **Ingress Controller**: Centralized external access
-- **Service Mesh**: Internal service communication
-- **RBAC**: Kubernetes role-based access control (future enhancement)
-
 ## Monitoring & Observability
 
 ### Logging Stack
@@ -277,14 +144,14 @@ graph TB
 ## Deployment Workflow
 
 1. **Code Commit**: Developer pushes to GitHub
-2. **Jenkins Trigger**: Pipeline automatically starts
+2. **Jenkins Trigger**: Pipeline starts manually
 3. **Security Scan**: Checkov validates Terraform configurations
 4. **Infrastructure Planning**: Terraform plan shows changes
 5. **Manual Approval**: Production deployments require approval
 6. **Infrastructure Deployment**:
    - Start Minikube cluster
    - Enable required addons (registry, ingress)
-   - Build and push Docker images
+   - Build and push Docker images to local registry
    - Deploy application via Helm
    - Deploy monitoring stack
 7. **Verification**: Health checks and monitoring validation
@@ -292,7 +159,7 @@ graph TB
 ## Access URLs
 
 ### Development Environment
-- **Application**: `http://store-api.local`
+- **API**: `http://localhost:{forwarded_port}/items`
 - **Grafana**: `http://localhost:30300` (admin/admin)
 - **Minikube Dashboard**: `minikube dashboard`
 
@@ -304,12 +171,3 @@ graph TB
 - `DELETE /items/{id}` - Delete item
 - `GET /health` - Health check
 - `GET /ready` - Readiness check
-
-## Future Enhancements
-
-- **SSL/TLS**: Certificate management with cert-manager
-- **Horizontal Pod Autoscaling**: Dynamic scaling based on metrics
-- **Persistent Storage**: Database integration for data persistence
-- **Multi-environment**: Advanced GitOps with ArgoCD
-- **Service Mesh**: Istio for advanced traffic management
-- **Advanced Monitoring**: Prometheus metrics collection
