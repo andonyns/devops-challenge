@@ -40,6 +40,7 @@ secrets.yaml
 node_modules/
 dist/
 .idea/
+!.vscode/extensions.json
 .vscode/
 .DS_Store
 *.swp

@@ -10,13 +10,9 @@ This document describes the updated infrastructure architecture and CI/CD pipeli
 graph TB
     subgraph "External Access"
         U[Users]
-        LH[localhost/minikube]
     end
     
     subgraph "Kubernetes Cluster (Minikube)"
-        subgraph "Ingress Layer"
-            IC[Nginx Ingress Controller]
-        end
         
         subgraph "Application Layer"
             SVC[Store API Service<br/>ClusterIP:80]
@@ -29,14 +25,9 @@ graph TB
             PT[Promtail<br/>DaemonSet]
         end
         
-        subgraph "Infrastructure"
-            REG[Docker Registry<br/>localhost:5000]
-        end
     end
     
-    U --> IC
-    LH --> IC
-    IC --> SVC
+    U --> SVC
     SVC --> POD
     POD --> LK
     PT --> LK
@@ -44,13 +35,11 @@ graph TB
     
     classDef application fill:#e1f5fe
     classDef monitoring fill:#fff3e0
-    classDef infrastructure fill:#f3e5f5
     classDef external fill:#e8f5e8
     
     class POD,SVC application
     class GR,LK,PT monitoring
-    class IC,REG infrastructure
-    class U,LH external
+    class U external
 ```
 
 ## Infrastructure Components
@@ -59,7 +48,6 @@ graph TB
 - **Store API**: .NET 8 REST API with CRUD operations
 - **Docker Registry**: Local registry for container images
 - **Kubernetes Service**: ClusterIP service exposing the API internally
-- **Nginx Ingress**: External access via `store-api.local` (configurable per environment)
 
 ### Monitoring & Logging
 - **Grafana**: Visualization and dashboards (accessible via NodePort 30300)
@@ -84,49 +72,16 @@ graph TD
         SEC[Security Scan<br/>Checkov]
         TI[Terraform Init]
         TP[Terraform Plan]
-        TA[Terraform Apply<br/>(Manual Approval)]
         
         CO --> SEC
         SEC --> TI
         TI --> TP
-        TP --> TA
     end
     
-    subgraph "Build & Deploy Process"
-        subgraph "Terraform Modules"
-            CM[Cluster Module<br/>Start Minikube<br/>Enable Addons]
-            PM[Publish Module<br/>Build & Push Images]
-            BM[Backend Module<br/>Deploy Helm Chart]
-            LM[Logging Module<br/>Deploy Monitoring]
-        end
-        
-        CM --> PM
-        PM --> BM
-        CM --> LM
-    end
-    
-    subgraph "Target Environment"
-        MK[Minikube Cluster]
-        DR[Docker Registry]
-        K8S[Kubernetes Resources]
-        MON[Monitoring Stack]
-    end
-    
-    GH --> CO
-    TA --> CM
-    PM --> DR
-    BM --> K8S
-    LM --> MON
-    
-    classDef source fill:#e8f5e8
     classDef cicd fill:#fff3e0
-    classDef deploy fill:#e1f5fe
-    classDef target fill:#f3e5f5
     
     class GH source
     class CO,SEC,TI,TP,TA cicd
-    class CM,PM,BM,LM deploy
-    class MK,DR,K8S,MON target
 ```
 
 ## Monitoring & Observability
@@ -141,20 +96,21 @@ graph TD
 - **Readiness Probes**: `/ready` endpoint monitoring
 - **Resource Limits**: CPU and memory constraints
 
-## Deployment Workflow
+## Continuous Integration Workflow
 
 1. **Code Commit**: Developer pushes to GitHub
 2. **Jenkins Trigger**: Pipeline starts manually
 3. **Security Scan**: Checkov validates Terraform configurations
 4. **Infrastructure Planning**: Terraform plan shows changes
-5. **Manual Approval**: Production deployments require approval
-6. **Infrastructure Deployment**:
+
+## Deployment Workflow
+
+**Infrastructure Deployment**:
    - Start Minikube cluster
    - Enable required addons (registry, ingress)
    - Build and push Docker images to local registry
    - Deploy application via Helm
    - Deploy monitoring stack
-7. **Verification**: Health checks and monitoring validation
 
 ## Access URLs
 
@@ -171,3 +127,5 @@ graph TD
 - `DELETE /items/{id}` - Delete item
 - `GET /health` - Health check
 - `GET /ready` - Readiness check
+
+To test the API, you can use the HTTP VSCode Extension changing the port

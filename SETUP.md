@@ -11,19 +11,22 @@ There are two ways to configure the application, using Docker Compose or using K
 4. [Minikube](https://minikube.sigs.k8s.io/docs/start/)
 
 ### Local Jenkins in Docker
-1. Pull the Jenkins Docker image:
+1. Navigate to the /jenkins folder
+2. Pull the Jenkins Docker image:
    ```bash
-   docker pull jenkins/jenkins:lts
+   docker build -t local-jenkins:latest .
    ```
-2. Run Jenkins in a Docker container:
+3. Run Jenkins in a Docker container:
    ```bash
-   docker run -d -p 8080:8080 -p 50000:50000 \
+   docker run -d -p 8800:8080 -p 50000:50000 \
      -v jenkins_home:/var/jenkins_home \
      --name jenkins \
-     jenkins/jenkins:lts
+     local-jenkins:latest
    ```
-3. Access Jenkins at `http://localhost:8080`.
+3. Access Jenkins at `http://localhost:8800`.
 4. Follow the on-screen instructions to complete the setup.
+
+See the Jenkins folder [README](./jenkins/README.md) for more information
 
 ### Local Docker Registry
 1. Run a local Docker registry:
@@ -46,9 +49,9 @@ There are two ways to configure the application, using Docker Compose or using K
 
 ## Docker Compose
 
-### How to
+Ideal for local development and quick setup.
 
-See the [application README](./application/README.md) for detailed information.
+### How to
 
 From the `/application/` folder, run:
 ```bash
@@ -57,23 +60,12 @@ From the `/application/` folder, run:
 
 ## Kubernetes with Minikube (Recommended)
 
+The best way to use is through Terraform, which sets up:
+
+1. The minikube provisioning.
+2. Builds the application and pushes to the local registry.
+3. Upgrades the Helm charts to deploy the cluster. 
+
 ### How to
 
-1. Start Minikube:
-   ```bash
-   minikube start
-   ```
-2. Enable required addons:
-   ```bash
-   minikube addons enable ingress
-   minikube addons enable registry
-   ```
-3. Deploy the application and monitoring stack using Helm:
-   ```bash
-   helm install logging-stack kubernetes/logging-helm-chart
-   helm install application kubernetes/application-helm-chart
-   ```
-4. Access the application:
-   - **Store API**: `http://store-api.local`
-   - **Grafana**: `http://localhost:30300` (admin/admin)
-   - **Minikube Dashboard**: `minikube dashboard`
+From the terraform folder, Run `terraform apply` to setup the infrastructure.
