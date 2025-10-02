@@ -8,7 +8,6 @@ This repository contains the infrastructure and application code for the DevOps 
 - **Infrastructure as Code**: Terraform for provisioning Kubernetes clusters and resources.
 - **Monitoring and Logging**: Grafana, Loki, and Promtail for observability.
 - **CI/CD Pipeline**: Jenkins pipeline for automated builds, tests, and deployments.
-- **Cert-Manager Integration**: Automated SSL/TLS certificate management using Let's Encrypt.
 
 ## Prerequisites
 - Docker
@@ -49,38 +48,6 @@ cd devops-challenge
 3. Deploy the application:
    ```bash
    helm install application kubernetes/application-helm-chart
-   ```
-
-### 4. Configure Cert-Manager
-1. Install cert-manager:
-   ```bash
-   helm repo add jetstack https://charts.jetstack.io
-   helm repo update
-   helm install cert-manager jetstack/cert-manager \
-     --namespace cert-manager \
-     --create-namespace \
-     --set installCRDs=true
-   ```
-2. Create a ClusterIssuer:
-   ```yaml
-   apiVersion: cert-manager.io/v1
-   kind: ClusterIssuer
-   metadata:
-     name: letsencrypt-prod
-   spec:
-     acme:
-       server: https://acme-v02.api.letsencrypt.org/directory
-       email: your-email@example.com
-       privateKeySecretRef:
-         name: letsencrypt-prod
-       solvers:
-         - http01:
-             ingress:
-               class: nginx
-   ```
-   Apply the configuration:
-   ```bash
-   kubectl apply -f cluster-issuer.yaml
    ```
 
 ### 5. Access the Application
