@@ -1,52 +1,26 @@
 loki:
-  # Removed custom image reference as the community Helm chart will manage it
+  image: grafana/loki:2.9.3
+  replicas: 1
+  service:
+    port: 3100
+    type: ClusterIP
   persistence:
-    enabled: true
-    size: 10Gi
-  config:
-    schema_config:
-      configs:
-        - from: "2020-10-24"
-          store: boltdb-shipper
-          object_store: filesystem
-          schema: v11
-          index:
-            prefix: index_
-            period: 168h
-    storage_config:
-      boltdb_shipper:
-        active_index_directory: /data/loki/boltdb-shipper-active
-        cache_location: /data/loki/boltdb-shipper-cache
-        shared_store: filesystem
-      filesystem:
-        directory: /data/loki/chunks
+    enabled: false
 
-  extraVolumes:
-    - name: data
-      emptyDir: {}
-  extraVolumeMounts:
-    - name: data
-      mountPath: /data
+promtail:
+  image: grafana/promtail:2.9.3
+  replicas: 1
 
 grafana:
-  # Removed custom image reference as the community Helm chart will manage it
-  admin:
-    existingSecret: grafana-admin-secret
+  image: grafana/grafana:10.2.2
+  replicas: 1
   service:
+    port: 3000
     type: NodePort
     nodePort: 30300
+  adminPassword: admin
   persistence:
-    enabled: true
-    size: 5Gi
-  datasources:
-    datasources.yaml:
-      apiVersion: 1
-      datasources:
-        - name: Loki
-          type: loki
-          url: http://{{ .Values.loki.service.port }}/loki
-          access: proxy
-          isDefault: true
+    enabled: false
 
 nameOverride: ""
 fullnameOverride: ""
